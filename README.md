@@ -14,14 +14,14 @@ This project implements an intelligent question-answering system for educational
 Our system architecture is divided into two main phases: an **Offline Pipeline** for knowledge extraction and an **Online Pipeline** for query processing and answer generation.
 
 ### 1. Offline Pipeline (Knowledge Extraction)
-- **Visual Processing:** Detect shot boundaries using TransNet V2 and extract keyframes by evaluating semantic changes using CLIP (`ViT-L/14`). Extract text from keyframes using DeepSeek-OCR[cite: 112].
-- **Audio Processing:** Extract speech-to-text transcripts from video audio using the Whisper model, retaining timestamp information[cite: 118].
-- **Multimodal Fusion & Normalization:** Merge visual slide text and audio transcripts based on overlapping timestamps[cite: 120, 121]. Utilize Google Gemini to rewrite and normalize the merged text into coherent, semantically rich contexts.
+- **Visual Processing:** Detect shot boundaries using TransNet V2 and extract keyframes by evaluating semantic changes using CLIP (`ViT-L/14`). Extract text from keyframes using DeepSeek-OCR.
+- **Audio Processing:** Extract speech-to-text transcripts from video audio using the Whisper model, retaining timestamp information.
+- **Multimodal Fusion & Normalization:** Merge visual slide text and audio transcripts based on overlapping timestamps. Utilize Google Gemini to rewrite and normalize the merged text into coherent, semantically rich contexts.
 - **Indexing & Storage:** Store the normalized text and index it using BM25, while also mapping it into dense vectors using semantic embedding models (e.g., `hiieu/halong_embedding`).
 
 ### 2. Online Pipeline (Retrieval & Generation)
-- **Query Rewriting:** Process user queries through Gemini LLM to clarify intent and expand academic terminology before retrieval[cite: 158, 159].
-- **Hybrid Retrieval:** Search the knowledge base by combining keyword-based BM25 and dense semantic embedding retrieval[cite: 175].
+- **Query Rewriting:** Process user queries through Gemini LLM to clarify intent and expand academic terminology before retrieval.
+- **Hybrid Retrieval:** Search the knowledge base by combining keyword-based BM25 and dense semantic embedding retrieval.
 - **Reranking:** Refine the order of retrieved context chunks using the `BAAI/bge-reranker-base` cross-encoder model to prioritize highly relevant information.
 - **Citation-Aware Generation:** Feed the top-ranked contexts to Google Gemini to generate natural, accurate answers that strictly include specific video timestamp citations.
 
@@ -35,18 +35,18 @@ Our system architecture is divided into two main phases: an **Offline Pipeline**
 
 ## Features
 
-- **Multimodal Data Ingestion:** Processes both visual slide content (OCR) and lecturer audio (ASR) to build a comprehensive knowledge base[cite: 91, 120].
-- **LLM-Powered Query Expansion:** Automatically rewrites user queries for improved retrieval accuracy[cite: 158].
-- **Advanced Hybrid Search & Reranking:** Combines keyword search (BM25) with semantic embeddings and a dedicated reranker model for optimal context retrieval[cite: 148, 152].
-- **Verifiable Answers:** Generates academic answers with direct timestamp citations, allowing users to quickly navigate to relevant video segments[cite: 198, 200].
+- **Multimodal Data Ingestion:** Processes both visual slide content (OCR) and lecturer audio (ASR) to build a comprehensive knowledge base.
+- **LLM-Powered Query Expansion:** Automatically rewrites user queries for improved retrieval accuracy.
+- **Advanced Hybrid Search & Reranking:** Combines keyword search (BM25) with semantic embeddings and a dedicated reranker model for optimal context retrieval.
+- **Verifiable Answers:** Generates academic answers with direct timestamp citations, allowing users to quickly navigate to relevant video segments.
 - **Workspace Management:** Upload, organize, and manage educational videos securely with JWT authentication.
 
 ## Evaluation & Experimental Results
 
-We evaluated our RAG pipeline comprehensively by assessing both the **Retrieval phase** and the **Generation phase** using a manually curated benchmark dataset of academic questions[cite: 220, 237].
+We evaluated our RAG pipeline comprehensively by assessing both the **Retrieval phase** and the **Generation phase** using a manually curated benchmark dataset of academic questions.
 
 ### 1. Retrieval Performance
-To evaluate the system's ability to find and rank relevant context chunks, we used Mean Reciprocal Rank (MRR) and Hit Rate metrics across various configurations[cite: 240, 241].
+To evaluate the system's ability to find and rank relevant context chunks, we used Mean Reciprocal Rank (MRR) and Hit Rate metrics across various configurations.
 
 | Retrieval Strategy | MRR | Hit@1 | Hit@3 | Hit@5 |
 | :--- | :---: | :---: | :---: | :---: |
@@ -59,7 +59,7 @@ To evaluate the system's ability to find and rank relevant context chunks, we us
 *The combination of domain-specific embeddings and a cross-encoder reranker achieved the best retrieval performance.*
 
 ### 2. Generation Performance (RAGAS Framework)
-We utilized the LLM-as-a-judge mechanism via the **RAGAS framework** to evaluate the quality of the generated answers[cite: 252, 253].
+We utilized the LLM-as-a-judge mechanism via the **RAGAS framework** to evaluate the quality of the generated answers.
 
 | Method / Pipeline | Faithfulness | Context Precision | Context Recall | Answer Correctness |
 | :--- | :---: | :---: | :---: | :---: |
