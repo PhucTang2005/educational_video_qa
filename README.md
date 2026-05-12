@@ -9,15 +9,17 @@ This project implements an intelligent question-answering system for educational
 
 ## System Pipeline
 
-![System Pipeline Architecture](./docs/images/pipeline.png)
-
 Our system architecture is divided into two main phases: an **Offline Pipeline** for knowledge extraction and an **Online Pipeline** for query processing and answer generation.
+
+![System Pipeline Architecture (offline)](./docs/images/data.png)
 
 ### 1. Offline Pipeline (Knowledge Extraction)
 - **Visual Processing:** Detect shot boundaries using TransNet V2 and extract keyframes by evaluating semantic changes using CLIP (`ViT-L/14`). Extract text from keyframes using DeepSeek-OCR.
 - **Audio Processing:** Extract speech-to-text transcripts from video audio using the Whisper model, retaining timestamp information.
 - **Multimodal Fusion & Normalization:** Merge visual slide text and audio transcripts based on overlapping timestamps. Utilize Google Gemini to rewrite and normalize the merged text into coherent, semantically rich contexts.
 - **Indexing & Storage:** Store the normalized text and index it using BM25, while also mapping it into dense vectors using semantic embedding models (e.g., `hiieu/halong_embedding`).
+
+![System Pipeline Architecture (online)](./docs/images/pipeline.png)
 
 ### 2. Online Pipeline (Retrieval & Generation)
 - **Query Rewriting:** Process user queries through Gemini LLM to clarify intent and expand academic terminology before retrieval.
