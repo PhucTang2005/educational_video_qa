@@ -1,23 +1,28 @@
 ![demo](./docs/images/demo.png)
-
+![demo](./docs/images/pipeline.png)
 # Educational Video QA System
 
 ### Course Project – CS431: Deep Learning Techniques and Applications
 ### University of Information Technology – VNU-HCM (UIT)
 ### Lecturer: Dr. Nguyễn Vinh Tiệp
 
-This project implements an intelligent question-answering system for educational videos using a Retrieval-Augmented Generation (RAG) pipeline. It enables users to upload video lectures, index their content, and ask natural-language questions which the system answers based on retrieved video segments.
+This project implements an intelligent question-answering system for educational videos using a Retrieval-Augmented Generation (RAG) pipeline. It enables users to upload video lectures, index their content, and ask natural-language questions which the system answers based on retrieved video segments. The system leverages multimodal processing to extract knowledge from both visual slides and audio lectures.
 
 ## System Pipeline
 
-1. Extract audio transcript from educational videos
-2. Extract visual features from video frames
-3. Convert multimodal information into structured JSON documents
-4. Chunk and index documents using vector embeddings
-5. Retrieve relevant content using Hybrid Search (Vector + BM25)
-6. Rerank retrieved chunks
-7. Generate answers using LLM-based RAG pipeline
-8. Evaluate system performance with RAGAS benchmark
+Our system architecture is divided into two main phases: an **Offline Pipeline** for knowledge extraction and an **Online Pipeline** for query processing and answer generation.
+
+### 1. Offline Pipeline (Knowledge Extraction)
+- **Visual Processing:** Detect shot boundaries using TransNet V2 and extract keyframes by evaluating semantic changes using CLIP (`ViT-L/14`). Extract text from keyframes using DeepSeek-OCR[cite: 112].
+- **Audio Processing:** Extract speech-to-text transcripts from video audio using the Whisper model, retaining timestamp information[cite: 118].
+- **Multimodal Fusion & Normalization:** Merge visual slide text and audio transcripts based on overlapping timestamps[cite: 120, 121]. Utilize Google Gemini to rewrite and normalize the merged text into coherent, semantically rich contexts.
+- **Indexing & Storage:** Store the normalized text and index it using BM25, while also mapping it into dense vectors using semantic embedding models (e.g., `hiieu/halong_embedding`).
+
+### 2. Online Pipeline (Retrieval & Generation)
+- **Query Rewriting:** Process user queries through Gemini LLM to clarify intent and expand academic terminology before retrieval[cite: 158, 159].
+- **Hybrid Retrieval:** Search the knowledge base by combining keyword-based BM25 and dense semantic embedding retrieval[cite: 175].
+- **Reranking:** Refine the order of retrieved context chunks using the `BAAI/bge-reranker-base` cross-encoder model to prioritize highly relevant information.
+- **Citation-Aware Generation:** Feed the top-ranked contexts to Google Gemini to generate natural, accurate answers that strictly include specific video timestamp citations.
 
 ## Team Members
 
@@ -29,16 +34,31 @@ This project implements an intelligent question-answering system for educational
 
 ## Features
 
--   Upload and manage educational videos
--   Intelligent question answering based on video content
--   Workspace management and video organization
--   Semantic search using vector embeddings
--   BM25-based reranking
--   User authentication with JWT
+- **Multimodal Data Ingestion:** Processes both visual slide content (OCR) and lecturer audio (ASR) to build a comprehensive knowledge base[cite: 91, 120].
+- **LLM-Powered Query Expansion:** Automatically rewrites user queries for improved retrieval accuracy[cite: 158].
+- **Advanced Hybrid Search & Reranking:** Combines keyword search (BM25) with semantic embeddings and a dedicated reranker model for optimal context retrieval[cite: 148, 152].
+- **Verifiable Answers:** Generates academic answers with direct timestamp citations, allowing users to quickly navigate to relevant video segments[cite: 198, 200].
+- **Workspace Management:** Upload, organize, and manage educational videos securely with JWT authentication.
 
 ## Evaluation & Experimental Results
 
-We evaluated our RAG pipeline using the **RAGAS framework** across different retrieval and generation configurations. The evaluation focuses on how well the system retrieves relevant context and generates accurate answers.
+We evaluated our RAG pipeline comprehensively by assessing both the **Retrieval phase** and the **Generation phase** using a manually curated benchmark dataset of academic questions[cite: 220, 237].
+
+### 1. Retrieval Performance
+To evaluate the system's ability to find and rank relevant context chunks, we used Mean Reciprocal Rank (MRR) and Hit Rate metrics across various configurations[cite: 240, 241].
+
+| Retrieval Strategy | MRR | Hit@1 | Hit@3 | Hit@5 |
+| :--- | :---: | :---: | :---: | :---: |
+| **BM25 (Baseline)** | 0.844 | 0.74 | 0.96 | 0.98 |
+| **dangvantuan/vietnamese-embedding** | 0.581 | 0.42 | 0.68 | 0.80 |
+| **hiieu/halong_embedding** | 0.958 | 0.94 | 0.96 | 0.98 |
+| **BM25 + hiieu/halong_embedding** | 0.915 | 0.84 | 0.98 | 1.00 |
+| **hiieu/halong_embedding + BAAI/bge-reranker-base** | **0.970** | **0.94** | **1.00** | **1.00** |
+
+*The combination of domain-specific embeddings and a cross-encoder reranker achieved the best retrieval performance.*
+
+### 2. Generation Performance (RAGAS Framework)
+We utilized the LLM-as-a-judge mechanism via the **RAGAS framework** to evaluate the quality of the generated answers[cite: 252, 253].
 
 | Method / Pipeline | Faithfulness | Context Precision | Context Recall | Answer Correctness |
 | :--- | :---: | :---: | :---: | :---: |
@@ -48,7 +68,7 @@ We evaluated our RAG pipeline using the **RAGAS framework** across different ret
 | **hiieu/halong_embedding + BM25 + Gemini** | 0.9437 | 0.8776 | **0.9192** | 0.6353 |
 | **hiieu/halong_embedding + BAAI/bge-reranker-base + Gemini** | **0.9497** | 0.8800 | 0.8967 | **0.6391** |
 
-> *Note: The best performing score for each metric is highlighted in **bold**.*
+*The results demonstrate that improving retrieval ranking directly enhances the faithfulness and overall correctness of the final answers generated by the LLM.*
 
 ## Tech Stack
 
