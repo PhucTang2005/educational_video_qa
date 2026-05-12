@@ -3,23 +3,29 @@
 # Educational Video QA System
 
 ### Course Project – CS431: Deep Learning Techniques and Applications
-
 ### University of Information Technology – VNU-HCM (UIT)
-
 ### Lecturer: Dr. Nguyễn Vinh Tiệp
 
 This project implements an intelligent question-answering system for educational videos using a Retrieval-Augmented Generation (RAG) pipeline. It enables users to upload video lectures, index their content, and ask natural-language questions which the system answers based on retrieved video segments.
 
+## System Pipeline
+
+1. Extract audio transcript from educational videos
+2. Extract visual features from video frames
+3. Convert multimodal information into structured JSON documents
+4. Chunk and index documents using vector embeddings
+5. Retrieve relevant content using Hybrid Search (Vector + BM25)
+6. Rerank retrieved chunks
+7. Generate answers using LLM-based RAG pipeline
+8. Evaluate system performance with RAGAS benchmark
 
 ## Team Members
 
-| No. | Full Name         | Student ID | Role   |
-| --- | ----------------- | ---------- | ------ |
-| 1   | Pham Nguyen Tuong | 23521751   | Leader |
-| 2   | Chuong Hong Van   | 23521769   | Member |
-| 3   | Tang Hoang Phuc   | 23521219   | Member |
-
-
+| No. | Full Name         | Student ID | Responsibilities                                                                                                                                                                                                                           |
+| --- | ----------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Pham Nguyen Tuong | 23521751   | Project leader. Designed benchmark dataset from educational videos with 100 QA pairs and references, performed evaluation using RAGAS, and integrated LLM-based answer generation from processed multimodal features.                      |
+| 2   | Chuong Hong Van   | 23521769   | Developed visual processing pipeline, implemented demo workflow, and integrated visual/audio feature extraction pipelines into unified Jupyter Notebook processing for JSON-based feature generation used by the RAG system.               |
+| 3   | Tang Hoang Phuc   | 23521219   | Developed audio processing pipeline, extracted speech transcripts from educational videos, and prepared transcript-based semantic features for multimodal retrieval and question answering.                                                |
 
 ## Features
 
@@ -30,10 +36,23 @@ This project implements an intelligent question-answering system for educational
 -   BM25-based reranking
 -   User authentication with JWT
 
+## Evaluation & Experimental Results
+
+We evaluated our RAG pipeline using the **RAGAS framework** across different retrieval and generation configurations. The evaluation focuses on how well the system retrieves relevant context and generates accurate answers.
+
+| Method / Pipeline | Faithfulness | Context Precision | Context Recall | Answer Correctness |
+| :--- | :---: | :---: | :---: | :---: |
+| **BM25 + Gemini** | 0.9170 | 0.8261 | 0.8167 | 0.6059 |
+| **dangvantuan/vietnamese-embedding + Gemini** | 0.7631 | 0.6800 | 0.6880 | 0.5590 |
+| **hiieu/halong_embedding + Gemini** | 0.9181 | **0.9400** | 0.8894 | 0.6351 |
+| **hiieu/halong_embedding + BM25 + Gemini** | 0.9437 | 0.8776 | **0.9192** | 0.6353 |
+| **hiieu/halong_embedding + BAAI/bge-reranker-base + Gemini** | **0.9497** | 0.8800 | 0.8967 | **0.6391** |
+
+> *Note: The best performing score for each metric is highlighted in **bold**.*
+
 ## Tech Stack
 
 ### Backend
-
 -   FastAPI
 -   MongoDB (Motor)
 -   LangChain + ChromaDB
@@ -42,7 +61,6 @@ This project implements an intelligent question-answering system for educational
 -   PyTorch + OpenCV
 
 ### Frontend
-
 -   React + TypeScript
 -   Vite
 -   Ant Design
@@ -63,8 +81,6 @@ This project implements an intelligent question-answering system for educational
 ```bash
 git clone <repository-url>
 cd educational_video_qa
-```
-
 ### 2. Backend Setup
 
 ```bash
