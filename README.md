@@ -1,5 +1,4 @@
 ![demo](./docs/images/demo.png)
-![demo](./docs/images/pipeline.png)
 # Educational Video QA System
 
 ### Course Project – CS431: Deep Learning Techniques and Applications
@@ -9,6 +8,8 @@
 This project implements an intelligent question-answering system for educational videos using a Retrieval-Augmented Generation (RAG) pipeline. It enables users to upload video lectures, index their content, and ask natural-language questions which the system answers based on retrieved video segments. The system leverages multimodal processing to extract knowledge from both visual slides and audio lectures.
 
 ## System Pipeline
+
+![System Pipeline Architecture](./docs/images/pipeline.png)
 
 Our system architecture is divided into two main phases: an **Offline Pipeline** for knowledge extraction and an **Online Pipeline** for query processing and answer generation.
 
